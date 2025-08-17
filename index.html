@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Glass Login Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass-card {
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.125);
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        .glass-card:hover {
+            transform: translateZ(20px);
+            box-shadow: 0 12px 48px 0 rgba(31, 38, 135, 0.5);
+        }
+        .input-field {
+            backdrop-filter: blur(5px);
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            height: 100vh;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <div class="glass-card w-full max-w-md p-8" id="loginCard">
+        <h2 class="text-3xl font-bold text-white text-center mb-8">Welcome Back</h2>
+        
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label for="username" class="block text-sm font-medium text-white mb-2">Username</label>
+                <input type="text" id="username" name="username" 
+                       class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-gray-200 focus:outline-none"
+                       placeholder="Enter your username" required>
+            </div>
+            
+            <div>
+                <label for="password" class="block text-sm font-medium text-white mb-2">Password</label>
+                <input type="password" id="password" name="password" 
+                       class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-gray-200 focus:outline-none"
+                       placeholder="Enter your password" required>
+            </div>
+            
+            <button type="submit" class="submit-btn w-full py-3 px-4 rounded-lg text-white font-semibold">
+                Sign In
+            </button>
+            
+            <div id="errorMessage" class="text-red-300 text-sm text-center hidden">
+                Invalid username or password
+            </div>
+        </form>
+    </div>
+
+   <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm');
+    
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        // Check credentials (admin / talha1320z@)
+        if (username === 'admin' && password === 'talha1320z@') {
+            // Redirect to home.html after successful login
+            window.location.href = 'home.html';
+        } else {
+            // Show error message
+            document.getElementById('errorMessage').classList.remove('hidden');
+            
+            // Shake animation for error
+            document.getElementById('loginCard').style.animation = 'shake 0.5s';
+            setTimeout(() => {
+                document.getElementById('loginCard').style.animation = '';
+            }, 500);
+        }
+    });
+});
+</script>
+
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) rotateX(0) rotateY(0); }
+            20%, 60% { transform: translateX(-10px) rotateY(-5deg); }
+            40%, 80% { transform: translateX(10px) rotateY(5deg); }
+        }
+    </style>
+</body>
+</html>

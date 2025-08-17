@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlogVerse - Where Stories Come Alive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.0.35/build/spline-viewer.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Hero parallax background */
+        .parallax-bg {
+            background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            will-change: transform;
+        }
+
+        /* Secondary parallax backgrounds */
+        .parallax-blog {
+            background-image: url('https://images.unsplash.com/photo-1432821596592-e2c18b78144f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            will-change: transform;
+        }
+
+        .parallax-about {
+            background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            will-change: transform;
+        }
+
+        /* Card animations */
+        .blog-card {
+            transform: translateY(60px);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .blog-card.animate {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* 3D character container */
+        .character-container {
+            transform: translateY(30px);
+            opacity: 0;
+            transition: all 1.2s ease-out;
+        }
+
+        .character-container.loaded {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Floating animation */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Gradient overlays */
+        .gradient-overlay {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(147, 51, 234, 0.8) 100%);
+        }
+
+        /* Text glow effect */
+        .text-glow {
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+        }
+
+        /* Smooth scroll indicator */
+        .scroll-indicator {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            width: 3px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            z-index: 100;
+        }
+
+        .scroll-progress {
+            width: 100%;
+            background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+            border-radius: 2px;
+            height: 0%;
+            transition: height 0.2s ease-out;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white overflow-x-hidden">
+
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-progress"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-gray-900/80 backdrop-blur-md border-b border-gray-800 z-50">
+        <div class="container mx-auto px-6">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-2">
+                    <div
+                        class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <span
+                        class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">GCB.SKP</span>
+                </div>
+
+                <div class="hidden md:flex space-x-8">
+                    <a href="#home" class="text-gray-300 hover:text-white transition-colors">Home</a>
+                    <a href="#blog" class="text-gray-300 hover:text-white transition-colors">Blog</a>
+                    <a href="#about" class="text-gray-300 hover:text-white transition-colors">About</a>
+                    <a href="#contact" class="text-gray-300 hover:text-white transition-colors">Contact</a>
+                </div>
+
+
+                <a href="">
+                    <button
+                        class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105">
+                        Sign Up
+                    </button>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Parallax Background -->
+    <section id="home" class="min-h-screen parallax-bg relative overflow-hidden">
+        <div class="gradient-overlay absolute inset-0"></div>
+
+        <!-- Animated shapes -->
+        <div class="absolute top-20 left-10 w-20 h-20 bg-blue-500/20 rounded-full blur-xl floating"></div>
+        <div class="absolute top-40 right-20 w-32 h-32 bg-purple-500/20 rounded-full blur-xl floating"
+            style="animation-delay: -3s;"></div>
+        <div class="absolute bottom-20 left-20 w-16 h-16 bg-pink-500/20 rounded-full blur-xl floating"
+            style="animation-delay: -1.5s;"></div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="min-h-screen flex items-center">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+                    <!-- Text Content -->
+                    <div class="text-center lg:text-left">
+                        <div class="mb-6">
+                            <span
+                                class="inline-block px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-blue-500/30 rounded-full text-blue-300 text-sm font-medium mb-4">
+                                Welcome to the Blogs of GC.SKP
+                            </span>
+                        </div>
+
+                        <h1 class="text-4xl lg:text-7xl font-bold mb-8 leading-tight">
+                            <span
+                                class="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent text-glow">
+                                Gov.Graduate
+                            </span><br>
+                            <span class="text-white">Collage Sheikhupura</span>
+                        </h1>
+
+                        <p class="text-xl lg:text-2xl text-gray-300 mb-8 leading-relaxed max-w-2xl">
+                            Students Of BS-Political Science Semester Fifth
+                        </p>
+
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                            <button
+                                class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-500/25">
+                                Start Reading
+                            </button>
+                            <button
+                                class="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 backdrop-blur-sm">
+                                Watch Demo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hero Image -->
+                    <div class="character-container flex justify-center lg:justify-end">
+                        <div
+                            class="w-full max-w-xl h-96 lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/20 backdrop-blur-sm border border-white/10">
+                            <video preload="auto" autoplay
+                                class="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                                src="gcb-1.mp4"></video>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-8 left-[46%] transform -translate-x-1/2 text-center">
+            <p class="text-gray-300 mb-2">Scroll to explore</p>
+            <div class="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
+                <div class="w-1 h-3 bg-white/50 rounded-full mt-2 animate-bounce"></div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- contact  -->
+
+
+
+    <!-- Featured Blog Posts Section -->
+    <section id="blog" class="py-20 md:mt-0 mt-[648px] bg-gray-800 relative top-[50px] lg:top-20">
+        <div class="parallax-blog absolute inset-0 opacity-5"></div>
+        <div class="absolute inset-0 bg-gray-800/90"></div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <span
+                    class="inline-block px-4 py-2 bg-purple-500/20 backdrop-blur-sm border border-purple-500/30 rounded-full text-purple-300 text-sm font-medium mb-4">
+                    Featured Stories
+                </span>
+                <h2 class="text-4xl lg:text-5xl font-bold mb-6">
+                    <span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        Blogs of Classmates
+                    </span>
+                </h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+
+                </p>
+            </div>
+
+            <!-- Blog Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                <!-- Blog Card 1 -->
+                <article
+                    class="blog-card bg-gradient-to-br from-gray-700/50 to-gray-800/50 backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[350px] relative overflow-hidden">
+                        <video controls autocapitalize="" class="w-full h-full object-cover mix-blend-overlay"
+                            src="sem1.mp4"></video>
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-blue-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Video 1
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-blue-400 transition-colors">
+                            Video 1
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
+                                <span
+                                    class="text-xs text-gray-300">Haseeb-Humair-Talha(CR)-Sufya-Hassam-UsmanWalana-HajiUmair-Osama-Musaf</span>
+                            </div>
+                            <span class="text-xs text-gray-500">At least 1.2 year ago</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Blog Card 2 -->
+                <article
+                    class="blog-card backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[350px] relative overflow-hidden">
+                        <video controls autocapitalize="" class="w-full h-full object-cover mix-blend-overlay"
+                            src="vid2.mp4"></video>
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-purple-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Design
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors">
+                            Video 2
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+                            Semester 1
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300">GCB>SKP</span>
+                            </div>
+                            <span class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Blog Card 3 -->
+                <article
+                    class="blog-card backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[350px] relative overflow-hidden">
+                        <video controls autocapitalize="" class="w-full h-full object-cover mix-blend-overlay"
+                            src="vid3.mp4"></video>
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-purple-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Design
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors">
+                            Video 3
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+                            Semester 1
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300">Sarah Kim</span>
+                            </div>
+                            <span class="text-xs text-gray-500">8 min</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Blog Card 4 -->
+                <article
+                    class="blog-card backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[350px] relative overflow-hidden">
+                        <video controls autocapitalize="" class="w-full h-full object-cover mix-blend-overlay"
+                            src="vid4.mp4"></video>
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-purple-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Design
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors">
+                            Video 4
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+                            Semester 1
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300">BCB.SKP</span>
+                            </div>
+                            <span class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Blog Card 5 -->
+                <article
+                    class="blog-card backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[350px] relative overflow-hidden">
+                        <img class="w-full h-full object-cover mix-blend-overlay" src="img1.jpg" alt="">
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-purple-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Image
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors">
+                            Image 1
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+                            Semester 1
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300">GCB.SKP</span>
+                            </div>
+                            <span class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Blog Card 6 -->
+                <article
+                    class="blog-card backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[350px] relative overflow-hidden">
+                        <img class="w-full h-full object-cover mix-blend-overlay" src="img2.jpg" alt="">
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-purple-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Image
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors">
+                            Image 2
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+                            Semester 1
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300">GCB.SKP</span>
+                            </div>
+                            <span class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                </article>
+                <!-- Blog Card 7 -->
+                <article
+                    class="blog-card backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[350px] relative overflow-hidden">
+                        <img class="w-full h-full object-cover mix-blend-overlay" src="img3.jpg" alt="">
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-purple-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Image
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors">
+                            Image 1
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+                            Semester 1
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300">GCB.SKP</span>
+                            </div>
+                            <span class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                </article>
+                <!-- blog 8  -->
+
+                <article
+                    class="blog-card backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[350px] relative overflow-hidden">
+                        <img class="w-full h-full object-cover mix-blend-overlay" src="img4.jpg" alt="">
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-purple-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Image
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors">
+                            Image 1
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+                            Semester 1
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300">GCB.SKP</span>
+                            </div>
+                            <span class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- blog 9 video  -->
+                <article
+                    class="blog-card backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[350px] relative overflow-hidden">
+                        <video controls autocapitalize="" class="w-full h-full object-cover mix-blend-overlay"
+                            src="vid5.mp4"></video>
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-purple-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Video
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors">
+                            Video 5
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+                            Semester 1
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300">BCB.SKP</span>
+                            </div>
+                            <span class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- blog img 9  -->
+
+                <article
+                    class="blog-card backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[350px] relative overflow-hidden">
+                        <img class="w-full h-full object-cover mix-blend-overlay" src="img5.jpg" alt="">
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-purple-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Image
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors">
+                            Image 5
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+                            Semester 1
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300">GCB.SKP</span>
+                            </div>
+                            <span class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                </article>
+
+                <article
+                    class="blog-card backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[350px] relative overflow-hidden">
+                        <img class="w-full h-full object-cover mix-blend-overlay" src="img11.jpeg" alt="">
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-purple-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Image
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors">
+                            Image 5
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+                            Semester 1
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300">GCB.SKP</span>
+                            </div>
+                            <span class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                </article>
+
+                <article
+                    class="blog-card backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[350px] relative overflow-hidden">
+                        <img class="w-full h-full object-cover mix-blend-overlay" src="img12.jpeg" alt="">
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-purple-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Image
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors">
+                            Image 5
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+                            Semester 1
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300">GCB.SKP</span>
+                            </div>
+                            <span class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                </article>
+
+                <article
+                    class="blog-card backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[350px] relative overflow-hidden">
+                        <img class="w-full h-full object-cover mix-blend-overlay" src="img13.jpeg" alt="">
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-purple-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Image
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors">
+                            Image 5
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+                            Semester 1
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300">GCB.SKP</span>
+                            </div>
+                            <span class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                </article>
+
+
+                <article
+                    class="blog-card backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[350px] relative overflow-hidden">
+                        <img class="w-full h-full object-cover mix-blend-overlay" src="img14.jpeg" alt="">
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-purple-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Image
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors">
+                            Image 5
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+                            Semester 1
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300">GCB.SKP</span>
+                            </div>
+                            <span class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                </article>
+
+
+           
+
+
+            </div>
+
+
+                 <article
+                    class="mt-12 blog-card bg-gradient-to-br from-gray-700/50 to-gray-800/50 backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[100vh] w-full relative overflow-hidden">
+                        <video controls autocapitalize="" class="w-full h-full object-cover mix-blend-overlay"
+                            src="vid8.mp4"></video>
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-blue-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Video 1
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-blue-400 transition-colors">
+                            Video 8
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300"></span>
+                            </div>
+                            <span class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                </article>
+
+
+
+
+
+
+                   <article
+                    class="mt-12 blog-card bg-gradient-to-br from-gray-700/50 to-gray-800/50 backdrop-blur-sm border border-gray-600/30 rounded-2xl overflow-hidden hover:scale-105 transition-all duration-500 shadow-xl">
+                    <div class="h-[100vh] w-full relative overflow-hidden">
+                        <video controls autocapitalize="" class="w-full h-full object-cover mix-blend-overlay"
+                            src="vid9.mp4"></video>
+                        <div class="absolute top-3 left-3">
+                            <span
+                                class="bg-blue-500/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white">
+                                Video 9
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2 text-white group-hover:text-blue-400 transition-colors">
+                            Video 9
+                        </h3>
+                        <p class="text-gray-400 mb-3 leading-relaxed text-sm">
+
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
+                                <span class="text-xs text-gray-300"></span>
+                            </div>
+                            <span class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                </article>
+
+            <!-- View More Button -->
+            <div class="text-center mt-12">
+                <a href="pers-log-in.html">
+                    <button
+                        class="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg shadow-purple-500/25">
+                        Some Private Data
+                    </button>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 relative overflow-hidden">
+        <div class="parallax-about absolute inset-0 opacity-10"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900"></div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="max-w-4xl mx-auto text-center">
+                <span
+                    class="inline-block px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-blue-500/30 rounded-full text-blue-300 text-sm font-medium mb-8">
+                    About GCB.SKP
+                </span>
+
+                <h2 class="text-4xl lg:text-5xl font-bold mb-8">
+                    <span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        If you want to upload posts just contact me
+                    </span>
+                </h2>
+
+                <p class="text-xl text-gray-300 mb-12 leading-relaxed">
+
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                    <div class="text-center">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white">Immersive Experience</h3>
+                        <p class="text-gray-400">3D visuals and smooth animations that bring stories to life</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white">Quality Content</h3>
+                        <p class="text-gray-400">Curated articles from industry experts and thought leaders</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white">Community Driven</h3>
+                        <p class="text-gray-400">Join a community of creators, developers, and storytellers</p>
+                    </div>
+                </div>
+
+                <button
+                    class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-500/25">
+                    Join Our Community
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+
+
+    <!-- Footer -->
+    <footer class="py-12 bg-gray-800 border-t border-gray-700">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div
+                            class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold">GCB.SKP</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Where stories come alive</p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Home</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">About</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold mb-4">Categories</h4>
+                    <ul class="space-y-2 text-gray-400">
+
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold mb-4">Connect</h4>
+                    <div class="flex space-x-4">
+                        <a href="#"
+                            class="w-10 h-10 bg-gray-700 hover:bg-blue-500 rounded-lg flex items-center justify-center transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+                            </svg>
+                        </a>
+                        <a href="#"
+                            class="w-10 h-10 bg-gray-700 hover:bg-purple-500 rounded-lg flex items-center justify-center transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.756-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001.012.001z.017-.001z" />
+                            </svg>
+                        </a>
+                        <a href="#"
+                            class="w-10 h-10 bg-gray-700 hover:bg-pink-500 rounded-lg flex items-center justify-center transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 pt-8 text-center">
+                <p class="text-gray-400">&copy; 2024 BlogVerse. All rights reserved. Crafted with passion for immersive
+                    storytelling.</p>
+            </div>
+        </div>
+    </footer>
+
+
+
+    <script src="script.js"></script>
+</body>
+
+</html>
